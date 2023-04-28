@@ -630,6 +630,10 @@ if not isCdRunning then
         if ceklock(1796) >= 100 and TeleX > 0 and TeleY > 0 then
             convert(TeleX,TeleY)
         end
+		if ceklock(242) >= 100 then
+				shatter(242)
+				notif("`9WL `2Converted")
+		end
     end
         if breaks then
             break
