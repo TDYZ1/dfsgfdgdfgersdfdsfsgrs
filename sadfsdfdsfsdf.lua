@@ -59,7 +59,10 @@ trash = config.trash
 fast = config.fast
 autoTelephone = config.autoTelephone
 blockSDB = config.blockSDB
+
+
 breaks = false
+spam = false
 
 function save()
     local config = io.open("C:/config.lua", "w")
@@ -307,9 +310,10 @@ add_textbox|/change {to convert DL to BGL `p(dont forget set telephone pos)`3}|l
 add_textbox|/wm {to open fast wrench menu}|left|
 add_textbox|/save {to save proxy settings}|left|
 add_textbox|/relog {to reenter current world}|left|
+add_textbox|/spam {to turn on/off auto spam cheat}|left|
 add_textbox|/block {to block fucking SDB}|left|
 add_textbox|/setphone {to set telephon pos}|left|
-add_textbox|/telephone [auto/off] {to set auto convert on/off}|left|
+add_textbox|/telephone {to set auto convert on/off}|left|
 add_spacer|small|
 add_button|discord|`eDISCORD `3SERVER|noflags|0|0|
 add_spacer|small|
@@ -519,6 +523,15 @@ if types == 2 then
     elseif packet == "action|input\n|text|/save" then
         RunThread(save())
         return true
+    elseif packet == "action|input\n|text|/spam" then
+        if spam then
+            SendPacket(2,"action|dialog_return\ndialog_name|cheats\ncheck_autospam|0")
+            spam = false
+        else
+            SendPacket(2,"action|dialog_return\ndialog_name|cheats\ncheck_autospam|1")
+            spam = true
+        end
+        return true
     end
 end
 return false
@@ -550,6 +563,8 @@ AddCallback("fast", "OnPacket", function (types,packet)
         fast = "ban"
     elseif packet:find("trade|1") then
         fast = "trade"
+    elseif packet:find("telephone|1") and autoTelephone then
+        notif("`4Auto Telephone Is On")
     elseif packet:find("telephone|1") then
         fast = "telephone"
     elseif packet:find("drop|1") then
@@ -630,10 +645,6 @@ if not isCdRunning then
         if ceklock(1796) >= 100 and TeleX > 0 and TeleY > 0 then
             convert(TeleX,TeleY)
         end
-		if ceklock(242) >= 100 then
-				shatter(242)
-				notif("`9WL `2Converted")
-		end
     end
         if breaks then
             break
