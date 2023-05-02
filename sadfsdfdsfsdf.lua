@@ -555,7 +555,15 @@ AddCallback("fast", "OnPacket", function (types,packet)
         trade = 0
         fast = "false"
     end
-    if packet:find("pull|1") then
+    if packet:find("pull|0") or
+        packet:find("kick|0") or
+        packet:find("ban|0") or
+        packet:find("trade|0") or
+        packet:find("telephone|0") or
+        packet:find("drop|0") or
+        packet:find("trash|0") then
+        fast = "false"
+    elseif packet:find("pull|1") then
         fast = "pull"
     elseif packet:find("kick|1") then
         fast = "kick"
@@ -564,7 +572,7 @@ AddCallback("fast", "OnPacket", function (types,packet)
     elseif packet:find("trade|1") then
         fast = "trade"
     elseif packet:find("telephone|1") and autoTelephone then
-        notif("`4Auto Telephone Is On")
+        notif("`4Auto Telephone Is On Right Now")
     elseif packet:find("telephone|1") then
         fast = "telephone"
     elseif packet:find("drop|1") then
