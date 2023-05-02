@@ -224,21 +224,25 @@ elseif var[0] == "OnDialogRequest" and var[1]:find("Dial a number to call somebo
     return true
 elseif var[0] == "OnSDBroadcast" and blockSDB then
     return true
-elseif var[0] == "OnDialogRequest" and fast == "trash" and var[1]:find("How many to `4destroy``?") then
+elseif var[0] == "OnDialogRequest" and fast == "trash" and var[1]:find("end_dialog|trash") then
     if var[1]:find("embed_data|item_trash|(-%d+)") then
-        id = tonumber(var[1]:match("embed_data|item_trash|(-%d+)"))
-        drop(id,amountDrop)
+        local id = tonumber(var[1]:match("embed_data|item_trash|(-%d+)"))
+        local amount = var[1]:match("you have (.*)|left|")
+        SendPacket(2,"action|dialog_return\ndialog_name|trash\nitem_trash|"..id.."|\nitem_count|"..amount)
     else
-        id = tonumber(var[1]:match("embed_data|item_trash|(%d+)"))
-        drop(id,amountDrop)
+        local id = tonumber(var[1]:match("embed_data|item_trash|(%d+)"))
+        local amount = var[1]:match("you have (.*)|left|")
+        SendPacket(2,"action|dialog_return\ndialog_name|trash\nitem_trash|"..id.."|\nitem_count|"..amount)
     end
     return true
 elseif var[0] == "OnDialogRequest" and fast == "drop" and var[1]:find("How many to drop?") then
     if var[1]:find("embed_data|item_drop|(-%d+)") then
-        id = tonumber(var[1]:match("embed_data|item_drop|(-%d+)"))
+        local id = tonumber(var[1]:match("embed_data|item_drop|(-%d+)"))
+        local amountDrop = var[1]:match("you have (.*)|left|")
         drop(id,amountDrop)
     else
-        id = tonumber(var[1]:match("embed_data|item_drop|(%d+)"))
+        local id = tonumber(var[1]:match("embed_data|item_drop|(%d+)"))
+        local amountDrop = var[1]:match("you have (.*)|left|")
         drop(id,amountDrop)
     end
     return true
@@ -555,30 +559,33 @@ AddCallback("fast", "OnPacket", function (types,packet)
         trade = 0
         fast = "false"
     end
-    if packet:find("pull|0") or
-        packet:find("kick|0") or
-        packet:find("ban|0") or
-        packet:find("trade|0") or
-        packet:find("telephone|0") or
-        packet:find("drop|0") or
-        packet:find("trash|0") then
-        fast = "false"
-    elseif packet:find("pull|1") then
-        fast = "pull"
-    elseif packet:find("kick|1") then
-        fast = "kick"
-    elseif packet:find("ban|1") then
-        fast = "ban"
-    elseif packet:find("trade|1") then
-        fast = "trade"
-    elseif packet:find("telephone|1") and autoTelephone then
-        notif("`4Auto Telephone Is On Right Now")
-    elseif packet:find("telephone|1") then
-        fast = "telephone"
-    elseif packet:find("drop|1") then
-        fast = "drop"
-    elseif packet:find("trash|1") then
-        fast = "trash"
+    if packet:find("action|dialog_return\ndialog_name|fast") then
+        if packet:find("pull|1") then
+            fast = "pull"
+        elseif packet:find("kick|1") then
+            fast = "kick"
+        elseif packet:find("ban|1") then
+            fast = "ban"
+        elseif packet:find("trade|1") then
+            fast = "trade"
+        elseif packet:find("telephone|1") and autoTelephone then
+            notif("`4Auto Telephone Is On Right Now")
+        elseif packet:find("telephone|1") then
+            fast = "telephone"
+        elseif packet:find("drop|1") then
+            fast = "drop"
+        elseif packet:find("trash|1") then
+            fast = "trash"
+        elseif packet:find("pull|0") or
+            packet:find("kick|0") or
+            packet:find("ban|0") or
+            packet:find("trade|0") or
+            packet:find("telephone|0") or
+            packet:find("drop|0") or
+            packet:find("trash|0") then
+            fast = "false"
+        end
+        log(fast)
     end
     if packet:find("action|wrench") then
         netIdFast = packet:match("|netid|(.*)")
@@ -590,19 +597,6 @@ AddCallback("fast", "OnPacket", function (types,packet)
             fasts(fast,netIdFast)
         elseif fast == "trade" then
             fasts(fast,netIdFast)
-        end
-    end
-    if packet:find("action|drop") then
-        if fast == "drop" then
-            id = tonumber(packet:match("|itemID|(.*)"))
-            amountDrop = math.floor(ceklock(id))
-        end
-    end
-    if packet:find("action|trash") then
-        if fast == "trash" then
-            id = tonumber(packet:match("%d+"))
-            amount = ceklock(id)
-            SendPacket(2,"action|dialog_return\ndialog_name|trash\nitem_trash|"..id.."|\nitem_count|"..amount)
         end
     end
 end)
