@@ -177,7 +177,10 @@ RunThread(function()
     end
     isCdRunning = true
     if ceklock(1796) < dl then
-        shatter(7188)
+        repeat
+            shatter(7188)
+            Sleep(50)
+        until ceklock(1796) >= dl
         Sleep(100)
         drop(7188,bgl)
         Sleep(100)
@@ -185,7 +188,10 @@ RunThread(function()
         Sleep(100)
         drop(242,wl)
     elseif ceklock(242) < wl then
-        shatter(1796)
+        repeat
+            shatter(1796)
+            Sleep(50)
+        until ceklock(242) >= wl
         Sleep(100)
         drop(7188,bgl)
         Sleep(100)
@@ -364,13 +370,16 @@ if types == 2 then
     elseif packet:find("/dd") then
         RunThread(function() 
         isCdRunning = true
-        amount = tonumber(packet:match("/dd (.*)"))
+        local amount = tonumber(packet:match("/dd (.*)"))
         if ceklock(1796) < amount then
             shatter(7188)
-            Sleep(300)
+            Sleep(250)
             if ceklock(1796) >= amount then
                 drop(1796, amount)
-            else
+            elseif ceklock(1796) < amount then
+                shatter(7188)
+                drop(1796, amount)
+            elseif ceklock(7188) == 0 then
                 notif("`4Not Enough Lock")
             end
         else
@@ -381,7 +390,7 @@ if types == 2 then
         return true
     elseif packet:find("/db") then
         isCdRunning = true
-        amount = tonumber(packet:match("/db (.*)"))
+        local amount = tonumber(packet:match("/db (.*)"))
         if ceklock(7188) < amount then
             notif("`4Not Enough Lock")
         else
@@ -391,7 +400,7 @@ if types == 2 then
         return true
     elseif packet:find("/cd") then
         RunThread(function()
-            amount = tonumber(packet:match("/cd (.*)"))
+            local amount = tonumber(packet:match("/cd (.*)"))
             cd(amount)
         end)
         return true
@@ -402,13 +411,13 @@ if types == 2 then
             SendPacket(2, "action|dialog_return\ndialog_name|social\nbuttonClicked|bgl_withdraw")
         return true
     elseif packet:find("/wd") then
-        amount = packet:match("/wd (.*)")
+        local amount = packet:match("/wd (.*)")
         wd(amount)
         return true
     elseif packet == "action|input\n|text|/daw" then
-        bgl = ceklock(7188)
-        dl = ceklock(1796)
-        wl = ceklock(242)
+        local bgl = ceklock(7188)
+        local dl = ceklock(1796)
+        local wl = ceklock(242)
         RunThread(function() 
             drop(7188,bgl)
             Sleep(300)
@@ -418,7 +427,7 @@ if types == 2 then
         end)
         return true
     elseif packet == "action|input\n|text|/dpa" then
-        amount = ceklock(7188)
+        local amount = ceklock(7188)
         if amount == 0 then
             notif("`4Not Enough BGL")
         else
@@ -426,7 +435,7 @@ if types == 2 then
         end
         return true
 	elseif packet:find("/depo") then
-		amount = packet:match("/depo (.*)")
+		local amount = packet:match("/depo (.*)")
 		depo(amount)
         return true
     elseif packet == "action|input\n|text|/cgems" then
@@ -444,32 +453,32 @@ if types == 2 then
         fastMenu()
         return true
     elseif packet == "action|input\n|text|/p1" then
-        p1x = math.floor(GetLocal().pos_x//32)
-        p1y = math.floor(GetLocal().pos_y//32)
+        local p1x = math.floor(GetLocal().pos_x//32)
+        local p1y = math.floor(GetLocal().pos_y//32)
         LogToConsole("`9Player 1 Dbox Set To `2"..p1x.."`9,`2"..p1y)
         notif("`9Player 1 Dbox Set To `2"..p1x.."`9,`2"..p1y)
         return true
     elseif packet == "action|input\n|text|/p2" then
-        p2x = math.floor(GetLocal().pos_x//32)
-        p2y = math.floor(GetLocal().pos_y//32)
+        local p2x = math.floor(GetLocal().pos_x//32)
+        local p2y = math.floor(GetLocal().pos_y//32)
         notif("`9Player 2 Dbox Set To `2"..p2x.."`9,`2"..p2y)
         return true
     elseif packet == "action|input\n|text|/tele" then
         RunThread(function()
-            lock = ceklock(242) + ceklock(1796)*100 + ceklock(7188)*10000
-            currentPosx = math.floor(GetLocal().pos_x//32)
-            currentPosy = math.floor(GetLocal().pos_y//32)
+            local lock = ceklock(242) + ceklock(1796)*100 + ceklock(7188)*10000
+            local currentPosx = math.floor(GetLocal().pos_x//32)
+            local currentPosy = math.floor(GetLocal().pos_y//32)
             repeat
                 Sleep(300)
                 take(p1x,p1y)
                 take(p2x,p2y)
             until cekobjlock(p1x,p1y) == false or cekobjlock(p2x,p2y) == false
             Sleep(300)
-            curLock = ceklock(242) + ceklock(1796)*100 + ceklock(7188)*10000
-            totalLock = curLock - lock
+            local curLock = ceklock(242) + ceklock(1796)*100 + ceklock(7188)*10000
+            local totalLock = curLock - lock
             totalLock = math.floor(totalLock + 0.5) / 100
             totalLock = math.floor(totalLock)
-            tax = math.ceil((TaxAmount / 100) * totalLock)
+            local tax = math.ceil((TaxAmount / 100) * totalLock)
             win = math.floor(totalLock - tax)
             Sleep(300)
             LogToConsole("`9Bet `o: `1"..totalLock.."DL")
@@ -478,14 +487,12 @@ if types == 2 then
             notif("`9Bet `o: `1"..totalLock.."DL `2Tax `o: `1"..tax.."DL `eWin `o: `1"..win.."DL")
         end)
         return true
-    elseif packet == "buttonClicked|discord" then
-        os.execute("start https://linktr.ee/retscript")
     elseif packet:find("/w") then
-        wins = packet:match("/w(.*)")
+        local wins = packet:match("/w(.*)")
         RunThread(function()
             if wins == "1" then
-                curPosX = GetLocal().pos_x // 32
-                curPosY = GetLocal().pos_y // 32
+                local curPosX = GetLocal().pos_x // 32
+                local curPosY = GetLocal().pos_y // 32
                 GetLocal().facing_left = true
                 Sleep(100)
                 FindPath(p1x,p1y)
@@ -494,8 +501,8 @@ if types == 2 then
                 Sleep(1000)
                 FindPath(curPosX,curPosY)
             elseif wins == "2" then
-                curPosX = GetLocal().pos_x // 32
-                curPosY = GetLocal().pos_y // 32
+                local curPosX = GetLocal().pos_x // 32
+                local curPosY = GetLocal().pos_y // 32
                 GetLocal().facing_left = false
                 Sleep(100)
                 FindPath(p2x,p2y)
