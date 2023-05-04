@@ -453,14 +453,14 @@ if types == 2 then
         fastMenu()
         return true
     elseif packet == "action|input\n|text|/p1" then
-        local p1x = math.floor(GetLocal().pos_x//32)
-        local p1y = math.floor(GetLocal().pos_y//32)
+        p1x = math.floor(GetLocal().pos_x//32)
+        p1y = math.floor(GetLocal().pos_y//32)
         LogToConsole("`9Player 1 Dbox Set To `2"..p1x.."`9,`2"..p1y)
         notif("`9Player 1 Dbox Set To `2"..p1x.."`9,`2"..p1y)
         return true
     elseif packet == "action|input\n|text|/p2" then
-        local p2x = math.floor(GetLocal().pos_x//32)
-        local p2y = math.floor(GetLocal().pos_y//32)
+        p2x = math.floor(GetLocal().pos_x//32)
+        p2y = math.floor(GetLocal().pos_y//32)
         notif("`9Player 2 Dbox Set To `2"..p2x.."`9,`2"..p2y)
         return true
     elseif packet == "action|input\n|text|/tele" then
