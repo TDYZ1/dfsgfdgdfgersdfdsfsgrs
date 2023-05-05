@@ -434,8 +434,8 @@ if types == 2 then
             depo(amount)
         end
         return true
-	elseif packet:find("/depo") then
-		local amount = packet:match("/depo (.*)")
+	elseif packet:find("/dp") then
+		local amount = packet:match("/dp (.*)")
 		depo(amount)
         return true
     elseif packet == "action|input\n|text|/cgems" then
@@ -463,7 +463,7 @@ if types == 2 then
         p2y = math.floor(GetLocal().pos_y//32)
         notif("`9Player 2 Dbox Set To `2"..p2x.."`9,`2"..p2y)
         return true
-    elseif packet == "action|input\n|text|/tele" then
+    elseif packet == "action|input\n|text|/tp" then
         RunThread(function()
             local lock = ceklock(242) + ceklock(1796)*100 + ceklock(7188)*10000
             local currentPosx = math.floor(GetLocal().pos_x//32)
@@ -472,7 +472,7 @@ if types == 2 then
                 Sleep(300)
                 take(p1x,p1y)
                 take(p2x,p2y)
-            until cekobjlock(p1x,p1y) == false or cekobjlock(p2x,p2y) == false
+            until cekobjlock(p1x,p1y) == false and cekobjlock(p2x,p2y) == false
             Sleep(300)
             local curLock = ceklock(242) + ceklock(1796)*100 + ceklock(7188)*10000
             local totalLock = curLock - lock
