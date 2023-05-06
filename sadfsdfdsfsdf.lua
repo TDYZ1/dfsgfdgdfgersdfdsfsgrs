@@ -311,7 +311,7 @@ add_textbox|/ctax {to check current tax`3}|left|
 add_textbox|/cgems {to turn on/off check gems `p(default is on)`3}|left|
 add_textbox|/p1 {to set player 1 dbox}|left|
 add_textbox|/p2 {to set player 2 dbox}|left|
-add_textbox|/tele {to take bet and auto eat tax `p(dont forget to set player pos)`3}|left|
+add_textbox|/tp {to take bet and auto eat tax `p(dont forget to set player pos)`3}|left|
 add_textbox|/w1 {to drop bet to player 1 and auto tax}|left|
 add_textbox|/w2 {to drop bet to player 2 and auto tax}|left|
 add_spacer|small|
