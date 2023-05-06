@@ -37,7 +37,9 @@ if file_exists("C:/config.lua") == false then
     config:write("trash = 0,\n")
     config:write('fast = "false",\n')
     config:write("autoTelephone = true,\n")
-    config:write("blockSDB = true")
+    config:write("blockSDB = true,\n")
+    config:write("spamText = '`4Ret `1Proxy',\n")
+    config:write("spamDelay = 5000\n")
     config:write("}\nreturn config")
     config:close()
 end
@@ -59,8 +61,10 @@ trash = config.trash
 fast = config.fast
 autoTelephone = config.autoTelephone
 blockSDB = config.blockSDB
+spamText = config.spamText
+spamDelay = config.spamDelay
 
-
+p1x,p1y,p2x,p2y = 0,0,0,0
 breaks = false
 spam = false
 
@@ -81,7 +85,9 @@ function save()
         config:write("trash = "..trash..",\n")
         config:write('fast = "'..fast..'",\n')
         config:write("autoTelephone = "..tostring(autoTelephone)..",\n")
-        config:write("blockSDB = "..tostring(blockSDB).."\n")
+        config:write("blockSDB = "..tostring(blockSDB)..",\n")
+        config:write("spamText = "..spamText..",\n")
+        config:write("spamDelay = "..spamDelay.."\n")
         config:write("}\nreturn config")
         config:close()
         notif("`9Save `2Success")
@@ -210,6 +216,28 @@ RunThread(function()
 end)
 end
 
+spamDialog = [[
+set_default_color|`1
+
+add_label_with_icon|big|`oAuto Spam Menu|left|13886
+add_spacer|small|
+add_checkbox|spam|Auto Spam|0
+add_spacer|small|
+add_text_input|text|Text|]]..spamText..[[|128|
+add_text_input|delay|Delay (millisecond)|]]..spamDelay..[[|128|
+add_spacer|small|
+add_quick_exit|
+end_dialog|spam|Cancel|Apply|
+            ]]
+
+function spamMenu()
+    local var = {}
+    var[0] = "OnDialogRequest"
+    var[1] = spamDialog
+    var.netid = -1
+    SendVarlist(var)
+end
+
 AddCallback("block","OnVarlist" ,function(var,packet)
 if var[0] == "OnDialogRequest" and var[1]:find("end_dialog|bank_withdraw") then
     var[1]:gsub("`$","")
@@ -298,7 +326,7 @@ add_textbox|/ret {to preview proxy command}|left|
 add_textbox|/dd [amount] {to drop DL according to the amount}|left|
 add_textbox|/cd [amount] {to drop DL and WL according to the amount}|left|
 add_textbox|/db [amount] {to drop BGL according to the amount}|left|
-add_textbox|/dp [amount] {to depo BGL according to the amount}|left|
+add_textbox|/depo [amount] {to depo BGL according to the amount}|left|
 add_textbox|/dpa {to depo all BGL in inventory}|left|
 add_textbox|/wd [amount] {to withdraw BGL according to the amount}|left|
 add_textbox|/wda {to withdraw all bgl in bank}|left|
@@ -317,10 +345,12 @@ add_textbox|/w2 {to drop bet to player 2 and auto tax}|left|
 add_spacer|small|
 add_label_with_icon|small|`eOther Features|left|2
 add_textbox|/c {to convert DL to BGL `p(dont forget set telephone pos)`3}|left|
+add_textbox|/config {to check current setting}|left|
 add_textbox|/wm {to open fast wrench menu}|left|
 add_textbox|/save {to save proxy settings}|left|
 add_textbox|/relog {to reenter current world}|left|
-add_textbox|/spam {to turn on/off auto spam cheat}|left|
+add_textbox|/spam {to open spam menu}|left|
+add_textbox|/spams {to start/stop spam quickly}|left|
 add_textbox|/block {to block fucking SDB}|left|
 add_textbox|/setphone {to set telephon pos}|left|
 add_textbox|/telephone {to set auto convert on/off}|left|
@@ -434,8 +464,8 @@ if types == 2 then
             depo(amount)
         end
         return true
-	elseif packet:find("/dp") then
-		local amount = packet:match("/dp (.*)")
+	elseif packet:find("/depo") then
+		local amount = packet:match("/depo (.*)")
 		depo(amount)
         return true
     elseif packet == "action|input\n|text|/cgems" then
@@ -461,13 +491,12 @@ if types == 2 then
     elseif packet == "action|input\n|text|/p2" then
         p2x = math.floor(GetLocal().pos_x//32)
         p2y = math.floor(GetLocal().pos_y//32)
+        LogToConsole("`9Player 2 Dbox Set To `2"..p2x.."`9,`2"..p2y)
         notif("`9Player 2 Dbox Set To `2"..p2x.."`9,`2"..p2y)
         return true
     elseif packet == "action|input\n|text|/tp" then
         RunThread(function()
             local lock = ceklock(242) + ceklock(1796)*100 + ceklock(7188)*10000
-            local currentPosx = math.floor(GetLocal().pos_x//32)
-            local currentPosy = math.floor(GetLocal().pos_y//32)
             repeat
                 Sleep(300)
                 take(p1x,p1y)
@@ -535,20 +564,57 @@ if types == 2 then
         RunThread(save())
         return true
     elseif packet == "action|input\n|text|/spam" then
+        spamMenu()
+        return true
+    elseif packet == "action|input\n|text|/spams" then
         if spam then
-            SendPacket(2,"action|dialog_return\ndialog_name|cheats\ncheck_autospam|0")
             spam = false
+            LogToConsole("`4Stop `1Spam")
         else
-            SendPacket(2,"action|dialog_return\ndialog_name|cheats\ncheck_autospam|1")
             spam = true
+            LogToConsole("`2Start `1Spam")
         end
+        return true
+    elseif packet == "action|input\n|text|/config" then
+        local autoTelephones
+        local CekGemss
+        local blockSDBs
+        local fasts
+        if autoTelephone then
+            autoTelephones = "`2ON"
+        else
+            autoTelephones = "`4OFF"
+        end
+        if CekGems then
+            CekGemss = "`2ON"
+        else
+            CekGemss = "`4OFF"
+        end
+        if blockSDB then
+            blockSDBs = "`2ON"
+        else
+            blockSDBs = "`4OFF"
+        end
+        if fast == "false" then
+            fasts = "`4OFF"
+        end
+        LogToConsole("`9Tax : `2"..TaxAmount.."%")
+        LogToConsole("`9Tele Pos : `2"..TeleX..","..TeleY)
+        LogToConsole("`9Auto Telephone : "..autoTelephones)
+        LogToConsole("`9Check Gems : "..CekGemss)
+        LogToConsole("`9Fast Wrench : "..fasts)
+        LogToConsole("`9Block SDB : "..blockSDBs)
+        LogToConsole("`9Spam Text : `0"..spamText)
+        LogToConsole("`9Spam Delay : `2"..spamDelay)
+        LogToConsole("`9Player 1 Pos : `2"..p1x..","..p1y)
+        LogToConsole("`9Player 2 Pos : `2"..p2x..","..p2y)
         return true
     end
 end
 return false
 end)
 
-AddCallback("fast", "OnPacket", function (types,packet)
+AddCallback("listener", "OnPacket", function (types,packet)
     if packet:find("action|dialog_return\ndialog_name|fast") then
         pull = tonumber(packet:match("pull|(.*)kick"))
         kick = tonumber(packet:match("kick|(.*)ban"))
@@ -606,6 +672,18 @@ AddCallback("fast", "OnPacket", function (types,packet)
             fasts(fast,netIdFast)
         end
     end
+    if packet:find("action|dialog_return\ndialog_name|spam") then
+        spamText = packet:match("text|(.*)")
+        spamDelay = tonumber(packet:match("delay|(.*)"))
+        spam = false
+        if packet:find("spam|1") then
+            spam = true
+            spamDialog = spamDialog:gsub("Spam|0","Spam|1")
+        elseif packet:find("spam|0") then
+            spam = false
+            spamDialog = spamDialog:gsub("Spam|1","Spam|0")
+        end
+    end
 end)
 
 var2 = {}
@@ -641,6 +719,17 @@ AddCallback("fekspin", "OnVarlist", function(var,packet)
             text = "`4[FAKE]`0"..t1
             var1[2] = text
             SendVarlist(var1)
+        end
+    end
+end)
+
+RunThread(function()
+    while true do
+        if breaks then
+            break
+        elseif spam then
+            SendPacket(2,"action|input\n|text|"..spamText)
+            Sleep(spamDelay)
         end
     end
 end)
