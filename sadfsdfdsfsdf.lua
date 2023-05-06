@@ -298,7 +298,7 @@ add_textbox|/ret {to preview proxy command}|left|
 add_textbox|/dd [amount] {to drop DL according to the amount}|left|
 add_textbox|/cd [amount] {to drop DL and WL according to the amount}|left|
 add_textbox|/db [amount] {to drop BGL according to the amount}|left|
-add_textbox|/depo [amount] {to depo BGL according to the amount}|left|
+add_textbox|/dp [amount] {to depo BGL according to the amount}|left|
 add_textbox|/dpa {to depo all BGL in inventory}|left|
 add_textbox|/wd [amount] {to withdraw BGL according to the amount}|left|
 add_textbox|/wda {to withdraw all bgl in bank}|left|
@@ -316,7 +316,7 @@ add_textbox|/w1 {to drop bet to player 1 and auto tax}|left|
 add_textbox|/w2 {to drop bet to player 2 and auto tax}|left|
 add_spacer|small|
 add_label_with_icon|small|`eOther Features|left|2
-add_textbox|/change {to convert DL to BGL `p(dont forget set telephone pos)`3}|left|
+add_textbox|/c {to convert DL to BGL `p(dont forget set telephone pos)`3}|left|
 add_textbox|/wm {to open fast wrench menu}|left|
 add_textbox|/save {to save proxy settings}|left|
 add_textbox|/relog {to reenter current world}|left|
@@ -404,7 +404,7 @@ if types == 2 then
             cd(amount)
         end)
         return true
-    elseif packet == "action|input\n|text|/change" then
+    elseif packet == "action|input\n|text|/c" then
         convert(TeleX, TeleY)
         return true
 	elseif packet == "action|input\n|text|/wda" then
