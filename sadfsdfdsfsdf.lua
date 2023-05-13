@@ -38,7 +38,7 @@ if file_exists("C:/config.lua") == false then
     config:write('fast = "false",\n')
     config:write("autoTelephone = true,\n")
     config:write("blockSDB = true,\n")
-    config:write("spamText = '`4Ret `1Proxy',\n")
+    config:write('spamText = "`4Ret `1Proxy",\n')
     config:write("spamDelay = 5000\n")
     config:write("}\nreturn config")
     config:close()
