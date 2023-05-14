@@ -540,8 +540,10 @@ if types == 2 then
         return true
     elseif packet == "action|input\n|text|/spam" then
         if spam then
+            spam = false
             SendPacket(2,"action|dialog_return\ndialog_name|cheats\ncheck_autospam|0")
         else
+            spam = true
             SendPacket(2,"action|dialog_return\ndialog_name|cheats\ncheck_autospam|1")
         end
         return true
