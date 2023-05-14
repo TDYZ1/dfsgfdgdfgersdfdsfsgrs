@@ -38,8 +38,8 @@ if file_exists("C:/config.lua") == false then
     config:write('fast = "false",\n')
     config:write("autoTelephone = true,\n")
     config:write("blockSDB = true,\n")
-    config:write("spamText = '`4Ret `1Proxy',\n")
-    config:write("spamDelay = 5000\n")
+    config:write("p1 = {x = 0,y = 0},\n")
+    config:write("p2 = {x = 0,y = 0},\n")
     config:write("}\nreturn config")
     config:close()
 end
@@ -61,10 +61,8 @@ trash = config.trash
 fast = config.fast
 autoTelephone = config.autoTelephone
 blockSDB = config.blockSDB
-spamText = config.spamText
-spamDelay = config.spamDelay
+p1x,p1y,p2x,p2y = config.p1.x,config.p1.y,config.p2.x,config.p2.y
 
-p1x,p1y,p2x,p2y = 0,0,0,0
 breaks = false
 spam = false
 
@@ -86,8 +84,8 @@ function save()
         config:write('fast = "'..fast..'",\n')
         config:write("autoTelephone = "..tostring(autoTelephone)..",\n")
         config:write("blockSDB = "..tostring(blockSDB)..",\n")
-        config:write("spamText = '"..spamText.."',\n")
-        config:write("spamDelay = "..spamDelay.."\n")
+        config:write("p1 = {x = "..p1x..",y = "..p2y.."},\n")
+        config:write("p2 = {x = "..p2x..",y = "..p2y.."},\n")
         config:write("}\nreturn config")
         config:close()
         notif("`9Save `2Success")
@@ -216,28 +214,6 @@ RunThread(function()
 end)
 end
 
-spamDialog = [[
-set_default_color|`1
-
-add_label_with_icon|big|`oAuto Spam Menu|left|13886
-add_spacer|small|
-add_checkbox|spam|Auto Spam|0
-add_spacer|small|
-add_text_input|text|Text|]]..spamText..[[|128|
-add_text_input|delay|Delay (millisecond)|]]..spamDelay..[[|128|
-add_spacer|small|
-add_quick_exit|
-end_dialog|spam|Cancel|Apply|
-            ]]
-
-function spamMenu()
-    local var = {}
-    var[0] = "OnDialogRequest"
-    var[1] = spamDialog
-    var.netid = -1
-    SendVarlist(var)
-end
-
 AddCallback("block","OnVarlist" ,function(var,packet)
 if var[0] == "OnDialogRequest" and var[1]:find("end_dialog|bank_withdraw") then
     var[1]:gsub("`$","")
@@ -349,8 +325,7 @@ add_textbox|/config {to check current setting}|left|
 add_textbox|/wm {to open fast wrench menu}|left|
 add_textbox|/save {to save proxy settings}|left|
 add_textbox|/relog {to reenter current world}|left|
-add_textbox|/spam {to open spam menu}|left|
-add_textbox|/spams {to start/stop spam quickly}|left|
+add_textbox|/spam {to turn on auto spam in cheat menu}|left|
 add_textbox|/block {to block fucking SDB}|left|
 add_textbox|/setphone {to set telephon pos}|left|
 add_textbox|/telephone {to set auto convert on/off}|left|
@@ -564,15 +539,10 @@ if types == 2 then
         RunThread(save())
         return true
     elseif packet == "action|input\n|text|/spam" then
-        spamMenu()
-        return true
-    elseif packet == "action|input\n|text|/spams" then
         if spam then
-            spam = false
-            LogToConsole("`4Stop `1Spam")
+            SendPacket(2,"action|dialog_return\ndialog_name|cheats\ncheck_autospam|0")
         else
-            spam = true
-            LogToConsole("`2Start `1Spam")
+            SendPacket(2,"action|dialog_return\ndialog_name|cheats\ncheck_autospam|1")
         end
         return true
     elseif packet == "action|input\n|text|/config" then
@@ -670,18 +640,6 @@ AddCallback("listener", "OnPacket", function (types,packet)
             fasts(fast,netIdFast)
         elseif fast == "trade" then
             fasts(fast,netIdFast)
-        end
-    end
-    if packet:find("action|dialog_return\ndialog_name|spam") then
-        spamText = packet:match("text|(.*)")
-        spamDelay = tonumber(packet:match("delay|(.*)"))
-        spam = false
-        if packet:find("spam|1") then
-            spam = true
-            spamDialog = spamDialog:gsub("Spam|0","Spam|1")
-        elseif packet:find("spam|0") then
-            spam = false
-            spamDialog = spamDialog:gsub("Spam|1","Spam|0")
         end
     end
 end)
