@@ -574,8 +574,6 @@ if types == 2 then
         LogToConsole("`9Check Gems : "..CekGemss)
         LogToConsole("`9Fast Wrench : "..fasts)
         LogToConsole("`9Block SDB : "..blockSDBs)
-        LogToConsole("`9Spam Text : `0"..spamText)
-        LogToConsole("`9Spam Delay : `2"..spamDelay)
         LogToConsole("`9Player 1 Pos : `2"..p1x..","..p1y)
         LogToConsole("`9Player 2 Pos : `2"..p2x..","..p2y)
         return true
