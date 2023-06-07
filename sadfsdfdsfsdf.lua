@@ -497,7 +497,6 @@ if types == 2 then
             if wins == "1" then
                 local curPosX = GetLocal().pos_x // 32
                 local curPosY = GetLocal().pos_y // 32
-                GetLocal().facing_left = true
                 Sleep(100)
                 FindPath(p1x,p1y)
                 Sleep(300)
@@ -507,7 +506,6 @@ if types == 2 then
             elseif wins == "2" then
                 local curPosX = GetLocal().pos_x // 32
                 local curPosY = GetLocal().pos_y // 32
-                GetLocal().facing_left = false
                 Sleep(100)
                 FindPath(p2x,p2y)
                 Sleep(300)
