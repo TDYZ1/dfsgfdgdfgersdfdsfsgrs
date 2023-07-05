@@ -320,7 +320,7 @@ end
 local help = [[set_default_color|`3
 add_label_with_icon|big|`4RET `ePROXY|left|7188|
 add_spacer|small|
-add_label_with_icon|small|`1This Script Made By Rtnt-#7940|left|482|
+add_label_with_icon|small|`1This Script Made By ret7940|left|482|
 add_label_with_icon|small|`1Yang Resell Semoga Jadi Yatim Dan Masuk Neraka :D|left|482|
 add_label_with_icon|small|`1Link Discord : `2https://linktr.ee/retscript|left|482
 add_spacer|small|
