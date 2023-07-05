@@ -324,7 +324,7 @@ add_label_with_icon|small|`1This Script Made By Rtnt-#7940|left|482|
 add_label_with_icon|small|`1Yang Resell Semoga Jadi Yatim Dan Masuk Neraka :D|left|482|
 add_label_with_icon|small|`1Link Discord : `2https://linktr.ee/retscript|left|482
 add_spacer|small|
-add_label_with_icon|small|`eMain|left|13826
+add_label_with_icon|small|`eMain|left|14214
 add_textbox|/ret {to preview proxy command}|left|
 add_textbox|/dd [amount] {to drop DL according to the amount}|left|
 add_textbox|/cd [amount] {to drop DL and WL according to the amount}|left|
