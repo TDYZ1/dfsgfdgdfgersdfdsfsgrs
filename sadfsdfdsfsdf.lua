@@ -65,6 +65,12 @@ p1x,p1y,p2x,p2y = config.p1.x,config.p1.y,config.p2.x,config.p2.y
 
 breaks = false
 spam = false
+autoBuy = 0
+customPos = 0
+autoBuyPos = {
+    x = 0,
+    y = 0
+}
 
 function save()
     local config = io.open("C:/config.lua", "w")
@@ -258,8 +264,29 @@ elseif var[0] == "OnDialogRequest" and fast == "drop" and var[1]:find("How many 
     return true
 elseif var[0] == "OnTextOverlay" and var[1]:find("You don't have enough of those!") then
     return true
+elseif var[0] == "OnDialogRequest" and var[1]:find("end_dialog|telephone") and autoBuy == 1 then
+    return true
 end
 end)
+
+function autoDlMenu()
+    local menu = [[
+add_label_with_icon|big|`2AUTO `eBUY `1DL|left|7188|
+add_spacer|small|
+add_textbox|Stand In Front Of Telephone Or Use Already Set Tele Pos|
+add_checkbox|enable|Enable Auto Buy|]]..autoBuy..[[|
+add_checkbox|customPos|Custom Pos|]]..customPos..[[|
+add_textbox|Already Set Pos `1[`2]]..TeleX..[[`1,`2]]..TeleY..[[`1]|
+add_quick_exit|
+end_dialog|autodl|Cancel|Ok
+    ]]
+    local var = {
+        [0] = "OnDialogRequest",
+        [1] = menu,
+        netid = -1
+    }
+    SendVarlist(var)
+end
 
 function bubble(text)
     var = {}
@@ -329,6 +356,7 @@ add_textbox|/spam {to turn on auto spam in cheat menu}|left|
 add_textbox|/block {to block fucking SDB}|left|
 add_textbox|/setphone {to set telephon pos}|left|
 add_textbox|/telephone {to set auto convert on/off}|left|
+add_textbox|/autodl {to open auto buy dl menu}|left|
 add_spacer|small|
 add_button|discord|`eDISCORD `3SERVER|noflags|0|0|
 add_spacer|small|
@@ -497,6 +525,7 @@ if types == 2 then
             if wins == "1" then
                 local curPosX = GetLocal().pos_x // 32
                 local curPosY = GetLocal().pos_y // 32
+                GetLocal().facing_left = true
                 Sleep(100)
                 FindPath(p1x,p1y)
                 Sleep(300)
@@ -506,6 +535,7 @@ if types == 2 then
             elseif wins == "2" then
                 local curPosX = GetLocal().pos_x // 32
                 local curPosY = GetLocal().pos_y // 32
+                GetLocal().facing_left = false
                 Sleep(100)
                 FindPath(p2x,p2y)
                 Sleep(300)
@@ -577,6 +607,8 @@ if types == 2 then
         LogToConsole("`9Player 1 Pos : `2"..p1x..","..p1y)
         LogToConsole("`9Player 2 Pos : `2"..p2x..","..p2y)
         return true
+    elseif packet == "action|input\n|text|/autodl" then
+        autoDlMenu()
     end
 end
 return false
@@ -591,6 +623,17 @@ AddCallback("listener", "OnPacket", function (types,packet)
         telephone = tonumber(packet:match("telephone|(.*)drop"))
         drops = tonumber(packet:match("drop|(.*)trash"))
         trash = tonumber(packet:match("trash|(.*)"))
+    end
+    if packet:find("action|dialog_return\ndialog_name|autodl") then
+        autoBuy = tonumber(packet:match("enable|(.*)customPos"))
+        customPos = tonumber(packet:match("customPos|(.*)"))
+        if packet:find("customPos|1") then
+            autoBuyPos.x = TeleX
+            autoBuyPos.y = TeleY
+        else
+            autoBuyPos.x = math.floor(GetLocal().pos_x/32)
+            autoBuyPos.y = math.floor(GetLocal().pos_y/32)
+        end
     end
     if pull + kick + ban + trade > 1 then
         notif("`9Choose One Masbro")
@@ -709,13 +752,27 @@ end)
 
 while true do
 gems = GetLocal().gems
-Sleep(1000)
+Sleep(100)
 if CekGems then
     Sleep(1000)
     gems = GetLocal().gems - gems
     if gems > 0 then
         SendPacket(2,"action|input\n|text|Collected "..math.floor(gems).." (gems)")
     end
+end
+if autoBuy == 1 then
+    LogToConsole("Starting Buy")
+    isCdRunning = true
+    while GetLocal().gems >= 110000 and autoBuy == 1 and not breaks do
+        SendPacket(2,"action|dialog_return\ndialog_name|telephone\nnum|53785\nx|"..autoBuyPos.x.."|\ny|"..autoBuyPos.y.."|\nbuttonClicked|dlconvert")
+        Sleep(80)
+        if GetItemCount(1796) >= 100 then
+            SendPacket(2,"action|dialog_return\ndialog_name|telephone\nnum|53785\nx|"..autoBuyPos.x.."|\ny|"..autoBuyPos.y.."|\nbuttonClicked|bglconvert")
+            Sleep(80)
+        end
+    end
+    autoBuy = 0
+    isCdRunning = false
 end
 if breaks then
     break
